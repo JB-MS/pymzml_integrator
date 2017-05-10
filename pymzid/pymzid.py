@@ -10,7 +10,6 @@ Originally written by:
 
 """
 
-# from docopt import docopt
 from time import time
 from xml.dom import minidom
 import pandas as pd
@@ -18,6 +17,7 @@ import os.path
 import sys
 import re
 import numpy as np
+
 
 class Mzid(object):
     """
@@ -104,11 +104,19 @@ class Mzid(object):
         # Each SII is a PSM.
         SpectrumIdentificationResult = SpectrumIdentificationList.getElementsByTagName('SpectrumIdentificationResult')
 
-        for i in range(0, len(SpectrumIdentificationResult)):
+        length_of_identification_result =len(SpectrumIdentificationResult) 
+
+        for i in range(0, length_of_identification_result):
 
             # Print progress every 1000 records
             if i % 1000 == 0:
-                print('Processing ' + str(i) + ' of ' + str(len(SpectrumIdentificationResult)) + ' records (PSM).')
+                # print('Processing ' + str(i) + ' of ' + str(len(SpectrumIdentificationResult)) + ' records (PSM).')
+                print(
+                    'Processing {0} of {1} records (PSM).'.format(
+                        i,
+                        length_of_identification_result
+                    )
+                )
 
             sir_id = SpectrumIdentificationResult[i].attributes['id'].value
             spectrum_id = SpectrumIdentificationResult[i].attributes['spectrumID'].value.split('-')[0]
@@ -235,13 +243,21 @@ class Mzid(object):
 
         allPeptideList = []
 
-        for i in range(0, len(Peptide)):
+        length_Peptides = len(Peptide)
+
+        for i in range(0, length_Peptides):
 
             peptideList = []
 
             # Print progress every 1000 records
             if i % 1000 == 0:
-                print('Processing ' + str(i) + ' of ' + str(len(Peptide)) + ' records (Peptides).')
+                # print('Processing ' + str(i) + ' of ' + str(len(Peptide)) + ' records (Peptides).')
+                print(
+                    'Processing {0} of {1} records (Peptides).'.format(
+                        i,
+                        length_Peptides
+                    )
+                )
 
             pep_id = Peptide[i].attributes['id'].value
 
@@ -317,24 +333,37 @@ class Mzid(object):
         # Return an empty protein_df
         if not ProteinDetectionList:
             print('No Protein Detection List found.')
-            protein_df = pd.DataFrame(columns=['pag_id',
-                                               'pdh_ud',
-                                               'dbs_id',
-                                               'prot_pass_threshold',
-                                               'pe_id',
-                                               'sii_id'])
+            protein_df = pd.DataFrame(
+                columns = [
+                    'pag_id',
+                    'pdh_ud',
+                    'dbs_id',
+                    'prot_pass_threshold',
+                    'pe_id',
+                    'sii_id'
+                ]
+            )
             return protein_df
 
         # Traverse down to each ProteinAmbiguityGroup from each ProteinDetectionList - There are multiple PAG per PDL
         ProteinAmbiguityGroup = ProteinDetectionList[0].getElementsByTagName('ProteinAmbiguityGroup')
 
+        length_ProteinAmbiguityGroup = len(ProteinAmbiguityGroup)
+
         allProteinList = []
 
-        for i in range(0, len(ProteinAmbiguityGroup)):
+        for i in range(0, length_ProteinAmbiguityGroup):
 
             # Print progress every 1000 records
             if i % 1000 == 0:
-                print('Processing ' + str(i) + ' of ' + str(len(ProteinAmbiguityGroup)) + ' records (Proteins).')
+                # print('Processing ' + str(i) + ' of ' + str(len(ProteinAmbiguityGroup)) + ' records (Proteins).')
+                print(
+                    'Processing {0} of {1} records (Proteins).'.format(
+                        i,
+                        length_ProteinAmbiguityGroup
+                    )
+                )
+
 
             pag_id = ProteinAmbiguityGroup[i].attributes['id'].value
 
@@ -431,13 +460,21 @@ class Mzid(object):
 
         allPEList = []
 
-        for i in range(0, len(PeptideEvidence)):
+        length_PeptideEvidence = len(PeptideEvidence)
+
+        for i in range(0, length_PeptideEvidence):
 
             peList = []
 
             # Print progress every 1000 records
             if i % 1000 == 0:
-                print('Processing ' + str(i) + ' of ' + str(len(PeptideEvidence)) + ' records (PeptideEvidence).')
+                # print('Processing ' + str(i) + ' of ' + str(len(PeptideEvidence)) + ' records (PeptideEvidence).')
+                print(
+                    'Processing {0} of {1} records (PeptideEvidence).'.format(
+                        i,
+                        length_PeptideEvidence
+                    )
+                )
 
             pe_id    = PeptideEvidence[i].attributes['id'].value
             pep_id   = PeptideEvidence[i].attributes['peptide_ref'].value
@@ -488,17 +525,19 @@ class Mzid(object):
 
         allDBSList = []
 
-        for i in range(0, len(DBSequence)):
+        length_DBSequence = len(DBSequence)
+
+        for i in range(0, length_DBSequence):
 
             dbsList = []
 
             # Print progress every 1000 records
             if i % 1000 == 0:
                 print(
-
                     # 'Processing ' + str(i) + ' of ' + str(len(DBSequence)) + ' records (DatabaseSequences).'
-                    'Processing ' + str(i) + ' of ' + str(len(DBSequence)) + ' records (DatabaseSequences).'.format(
-
+                    'Processing {0} of {1} records (DatabaseSequences).'.format(
+                        i,
+                        length_DBSequence
                     )
                 )
 
