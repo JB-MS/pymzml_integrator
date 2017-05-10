@@ -3,7 +3,7 @@
 
 import os
 import sys
-from pymzid import Mzid
+from pymzid.pymzid import Mzid
 
 
 def main():
@@ -13,7 +13,10 @@ def main():
     © Johannes Leufken 2017
 
     '''
-    reader = Mzid(sys.argv[1])
+    reader = Mzid(
+        sys.argv[1],
+        verbose = False
+    )
     data_frame = reader.peptide_df
     for seq in data_frame['seq']:
         print(seq)

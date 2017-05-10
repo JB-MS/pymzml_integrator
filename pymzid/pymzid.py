@@ -20,7 +20,7 @@ Example:
 
 """
 
-from docopt import docopt
+# from docopt import docopt
 from time import time
 from xml.dom import minidom
 import pandas as pd
@@ -47,26 +47,30 @@ class Mzid(object):
 
     """
 
-    def __init__(self, path):
+    def __init__(self, path, verbose = False):
         """
         :param path: path of the mzid file to be loaded, e.g., "~/Desktop/example.mzid"
 
 
         """
-        self.path = os.path.join(path)
-        self.root = self.parse_file()
+        self.verbose                 = verbose
 
-        self.psm_df = self.read_psm()
-        self.peptide_df = self.read_peptide()
-        self.protein_df = self.read_protein()
-        self.pe_df = self.read_pe()
-        self.dbs_df = self.read_dbs()
+        self.path                    = os.path.join(path)
+        self.root                    = self.parse_file()
 
-        self.pep_summary_df = pd.DataFrame()
-        self.pro_summary_df = pd.DataFrame()
+        self.psm_df                  = self.read_psm()
+        self.peptide_df              = self.read_peptide()
+        self.protein_df              = self.read_protein()
+        self.pe_df                   = self.read_pe()
+        self.dbs_df                  = self.read_dbs()
 
-        self.filtered_protein_df = pd.DataFrame()
+        self.pep_summary_df          = pd.DataFrame()
+        self.pro_summary_df          = pd.DataFrame()
+
+        self.filtered_protein_df     = pd.DataFrame()
         self.filtered_pep_summary_df = pd.DataFrame()
+        
+        # print(self.verbose)
 
     def parse_file(self):
         """
@@ -176,7 +180,9 @@ class Mzid(object):
         # Convert into pandas dataframe
         psm_df = pd.DataFrame(allPsmList)
         psm_df.to_csv("all_psms.txt", sep='\t')
-        print(psm_df)
+        # print(self)
+        if self.verbose:
+            print(psm_df)
         #
         # Rename the columns in the PSM table
         #
@@ -289,9 +295,10 @@ class Mzid(object):
 
         # Create a dictionary that map old names to new names
         # The first three columns are ID, Sequence
-        newcol = {0: 'pep_id',
-                  1: 'seq',
-                  }
+        newcol = {
+            0 : 'pep_id',
+            1 : 'seq',
+        }
 
         # Getting the name of the cvParam from the first row of the ith column of the dataframe
         for i in range(2, len(colnames)):
@@ -468,13 +475,14 @@ class Mzid(object):
 
         # Create a dictionary that map old names to new names
         # The first three columns are ID, Sequence
-        newcol = {0: 'pe_id',
-                  1: 'pep_id',
-                  2: 'dbs_id',
-                  3: 'start',
-                  4: 'end',
-                  5: 'is_decoy',
-                  }
+        newcol = {
+            0 : 'pe_id',
+            1 : 'pep_id',
+            2 : 'dbs_id',
+            3 : 'start',
+            4 : 'end',
+            5 : 'is_decoy',
+        }
 
         pe_df.rename(columns=newcol, inplace=True)
 
@@ -694,14 +702,6 @@ def read(args):
 
     return sys.exit(os.EX_OK)
 
-#
-#   For doctest
-#
-#
-# Docopt
-#
+
 if __name__ == "__main__":
-    args = docopt(__doc__, version='Python mzid Parser v.0.1.0.')
-    print(args)
-    if args['read']:
-        read(args)
+    print(sys.argv)
