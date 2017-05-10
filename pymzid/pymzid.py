@@ -1,22 +1,12 @@
 """
+Adjusted by Johannes Leufken 2017
 
-pymzid - python mzIdentML Parser v.0.2.1. 2017-04-07
-pymzid reads in mzid files and creates flat summary tables.
-Written by Edward Lau (lau1@stanford.edu) 2016-2017
+Originally written by:
 
-Usage:
-    pymzid.py --help
-    pymzid.py read <mzid> [--out=mzid.txt --id --verbose]
+    pymzid - python mzIdentML Parser v.0.2.1. 2017-04-07
+    pymzid reads in mzid files and creates flat summary tables.
+    Written by Edward Lau (lau1@stanford.edu) 2016-2017
 
-Options:
-    -h --help           Show this screen.
-    -v --version        Show version.
-    --out=mzid.txt      Name of output file [default: mzid.txt]
-    --id                Only outputs rows associated with protein accession
-    --verbose           Prints progress messages
-
-Example:
-    parse_mzid.py percolator.target.mzid --out=mzid.txt
 
 """
 
@@ -68,9 +58,7 @@ class Mzid(object):
         self.pro_summary_df          = pd.DataFrame()
 
         self.filtered_protein_df     = pd.DataFrame()
-        self.filtered_pep_summary_df = pd.DataFrame()
-        
-        # print(self.verbose)
+        self.filtered_pep_summary_df = pd.DataFrame()        
 
     def parse_file(self):
         """
@@ -133,11 +121,11 @@ class Mzid(object):
 
                 psmList = []
 
-                sii_id = SpectrumIdentificationItem[j].attributes['id'].value
-                z = SpectrumIdentificationItem[j].attributes['chargeState'].value
-                mz = SpectrumIdentificationItem[j].attributes['experimentalMassToCharge'].value
-                calc_mz = SpectrumIdentificationItem[j].attributes['calculatedMassToCharge'].value
-                pep_id = SpectrumIdentificationItem[j].attributes['peptide_ref'].value
+                sii_id         = SpectrumIdentificationItem[j].attributes['id'].value
+                z              = SpectrumIdentificationItem[j].attributes['chargeState'].value
+                mz             = SpectrumIdentificationItem[j].attributes['experimentalMassToCharge'].value
+                calc_mz        = SpectrumIdentificationItem[j].attributes['calculatedMassToCharge'].value
+                pep_id         = SpectrumIdentificationItem[j].attributes['peptide_ref'].value
                 pass_threshold = SpectrumIdentificationItem[j].attributes['passThreshold'].value
 
                 # Get the Peptide Evidence Ref (need this to link to other tables later)
@@ -192,16 +180,17 @@ class Mzid(object):
 
         # Create a dictionary that map old names to new names
         # The first three columns are ID, Sequence
-        newcol = {0: 'sir_id',
-                  1: 'spectrum_id',
-                  2: 'sii_id',
-                  3: 'z',
-                  4: 'mz',
-                  5: 'calc_mz',
-                  6: 'pep_id',
-                  7: 'pep_pass_threshold',
-                  8: 'pe_id',
-                  }
+        newcol = {
+            0 : 'sir_id',
+            1 : 'spectrum_id',
+            2 : 'sii_id',
+            3 : 'z',
+            4 : 'mz',
+            5 : 'calc_mz',
+            6 : 'pep_id',
+            7 : 'pep_pass_threshold',
+            8 : 'pe_id',
+        }
 
         # Getting the name of the cvParam from the first filled row of the ith column of the dataframe
         for i in range(9, len(colnames)):
@@ -427,11 +416,9 @@ class Mzid(object):
                 temp.append(value)
             protein_df[i] = temp
 
-
         protein_df.rename(columns=newcol, inplace=True)
 
         return protein_df
-
 
     def read_pe(self):
         # Table #4. PeptideEvidence
@@ -452,11 +439,11 @@ class Mzid(object):
             if i % 1000 == 0:
                 print('Processing ' + str(i) + ' of ' + str(len(PeptideEvidence)) + ' records (PeptideEvidence).')
 
-            pe_id = PeptideEvidence[i].attributes['id'].value
-            pep_id = PeptideEvidence[i].attributes['peptide_ref'].value
-            dbs_id = PeptideEvidence[i].attributes['dBSequence_ref'].value
-            start = PeptideEvidence[i].attributes['start'].value
-            end = PeptideEvidence[i].attributes['end'].value
+            pe_id    = PeptideEvidence[i].attributes['id'].value
+            pep_id   = PeptideEvidence[i].attributes['peptide_ref'].value
+            dbs_id   = PeptideEvidence[i].attributes['dBSequence_ref'].value
+            start    = PeptideEvidence[i].attributes['start'].value
+            end      = PeptideEvidence[i].attributes['end'].value
             is_decoy = PeptideEvidence[i].attributes['isDecoy'].value
 
             # Add PeptideEvidence ID and reference to Peptide, reference DBSequence, and isDecoy flag to peList
@@ -488,7 +475,6 @@ class Mzid(object):
 
         return pe_df
 
-
     def read_dbs(self):
         #
         # Table #5: DBSequences
@@ -508,7 +494,13 @@ class Mzid(object):
 
             # Print progress every 1000 records
             if i % 1000 == 0:
-                print('Processing ' + str(i) + ' of ' + str(len(DBSequence)) + ' records (DatabaseSequences).')
+                print(
+
+                    # 'Processing ' + str(i) + ' of ' + str(len(DBSequence)) + ' records (DatabaseSequences).'
+                    'Processing ' + str(i) + ' of ' + str(len(DBSequence)) + ' records (DatabaseSequences).'.format(
+
+                    )
+                )
 
             dbs_id = DBSequence[i].attributes['id'].value
 
@@ -535,10 +527,11 @@ class Mzid(object):
 
         # Create a dictionary that map old names to new names
         # The first three columns are ID, Sequence
-        newcol = {0: 'dbs_id',
-                  1: 'length',
-                  2: 'acc',
-                  }
+        newcol = {
+            0 : 'dbs_id',
+            1 : 'length',
+            2 : 'acc',
+        }
 
         dbs_df.rename(columns=newcol, inplace=True)
 
@@ -676,31 +669,6 @@ class Mzid(object):
         self.filtered_pep_summary_df = self.filtered_pep_summary_df.reset_index(drop=True)
 
         return True
-
-def read(args):
-    """
-    Parse
-    :param args: Arguments from command line
-    :return:
-
-    """
-
-    # Handle command line arguments
-    mzid_loc = args['<mzid>']
-    out_loc = args['--out']
-    prot_only = args['--id']
-
-    try:
-        mzid = Mzid(mzid_loc)
-        mzid.make_peptide_summary(take_psm_df_cvParams=True)
-        mzid.filter_peptide_summary(lysine_filter=0, protein_q=1, peptide_q=1, unique_only=False, require_protein_id=prot_only)
-        mzid.filtered_pep_summary_df.to_csv(out_loc, sep='\t')
-
-
-    except OSError as e:
-        sys.exit('Failed to load mzid file. ' + str(e.errno))
-
-    return sys.exit(os.EX_OK)
 
 
 if __name__ == "__main__":
